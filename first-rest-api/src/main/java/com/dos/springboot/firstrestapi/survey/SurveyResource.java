@@ -22,14 +22,5 @@ public class SurveyResource {
 		return surveyService.retrieveAllSurveys();
 	}
 
-	public SurveyService getSurveyService() {
-		return surveyService;
-	}
-
-	public void setSurveyService(SurveyService surveyService) {
-		this.surveyService = surveyService;
-	}
-
-	
 	
 }
