@@ -1,8 +1,12 @@
 package com.dos.springboot.firstrestapi.survey;
 
+import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Predicate;
 
 import org.springframework.stereotype.Service;
 
@@ -26,5 +30,83 @@ public class SurveyService {
 
 	public List<Survey> retrieveAllSurveys() {
 		return surveys;
+	}
+
+	public Survey retrieveSurveyById( String surveyId ) {
+		Predicate<? super Survey> predicate = survey -> survey.getId().equalsIgnoreCase( surveyId );
+		Optional< Survey > optionalSuryvey = surveys.stream().filter( predicate ).findFirst();
+		
+		if( optionalSuryvey.isEmpty() ) {
+			return null;
+		}
+		
+		return optionalSuryvey.get();
+	}
+
+	private List<Question> retrieveAllSurveyQuestions(String surveyId) {
+		Survey survey = retrieveSurveyById( surveyId );
+		if( survey == null ) {
+			return null;
+		}
+		return survey.getQuestions();
+	}
+	
+	public Question retrieveSpecificSurveyQuestion(String surveyId, String questionId) {
+		List< Question > surveyQuestions = retrieveAllSurveyQuestions( surveyId );
+		
+		if( surveyQuestions == null ) {
+			return null;
+		}
+		Optional< Question > optionalQuestion = surveyQuestions.stream().filter( q -> q.getId().equalsIgnoreCase( questionId ) ).findFirst();
+		
+		if( optionalQuestion.isEmpty() ) {
+			return null;
+		}
+		
+		return optionalQuestion.get();
+	}
+
+	public String addNewSurveyQuestion(String surveyId, Question question) {
+		
+		List< Question > questions = retrieveAllSurveyQuestions( surveyId );
+		
+		String randomId = generateRandomId();
+		question.setId( randomId );
+		
+		questions.add( question );
+		
+		return question.getId();
+		
+	}
+
+	private String generateRandomId() {
+		SecureRandom secureRandom = new SecureRandom();
+		String randomId = new BigInteger( 32, secureRandom ).toString();
+		return randomId;
+	}
+
+	public String deleteSurveyQuestion(String surveyId, String questionId) {
+		
+		List< Question > surveyQuestions = retrieveAllSurveyQuestions( surveyId );
+		if( surveyQuestions == null ) {
+			return null;
+		}
+		
+		Predicate< ? super Question > predicate = q -> q.getId().equalsIgnoreCase( questionId );
+		boolean removed = surveyQuestions.removeIf( predicate );
+		
+		if( !removed ) {
+			return null;
+		}
+		
+		return questionId;
+	}
+
+	public void updateSurveyQuestion(String surveyId, String questionId, Question question) {
+		
+		List< Question > questions = retrieveAllSurveyQuestions( surveyId );
+		questions.removeIf( q -> q.getId().equalsIgnoreCase( questionId ) );
+		questions.add( question );
+		
 	}
 }
