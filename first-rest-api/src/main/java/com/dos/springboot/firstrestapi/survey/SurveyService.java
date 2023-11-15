@@ -43,7 +43,7 @@ public class SurveyService {
 		return optionalSuryvey.get();
 	}
 
-	private List<Question> retrieveAllSurveyQuestions(String surveyId) {
+	public List<Question> retrieveAllSurveyQuestions(String surveyId) {
 		Survey survey = retrieveSurveyById( surveyId );
 		if( survey == null ) {
 			return null;

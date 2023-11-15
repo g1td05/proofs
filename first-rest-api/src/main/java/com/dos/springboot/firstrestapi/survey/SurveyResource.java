@@ -48,6 +48,15 @@ public class SurveyResource {
 		return question;
 	}
 	
+	@RequestMapping( "/surveys/{surveyId}/questions" )
+	public List< Question > retrieveAllSurveyQuestions( @PathVariable String surveyId ) {
+		List< Question > questions = surveyService.retrieveAllSurveyQuestions( surveyId );
+		if( questions == null ) {
+			throw new ResponseStatusException( HttpStatus.NOT_FOUND );
+		}
+		return questions;
+	}
+	
 	@RequestMapping( value = "/surveys/{surveyId}/questions", method = RequestMethod.POST )
 	public ResponseEntity< Object > addNewSurveyQuestion( @PathVariable String surveyId, @RequestBody Question question ) {
 		String questionId = surveyService.addNewSurveyQuestion( surveyId, question );
