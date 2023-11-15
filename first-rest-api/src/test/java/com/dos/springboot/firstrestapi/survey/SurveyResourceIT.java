@@ -10,6 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 
 @SpringBootTest( webEnvironment = WebEnvironment.RANDOM_PORT )
@@ -20,21 +23,7 @@ public class SurveyResourceIT {
 
 	@Autowired
 	TestRestTemplate template;
-	
-	String str = """
-			
-			{
-				"id": "Question",
-				"description": "Most Popular Platform",
-				"options": [
-					"AWS",
-					"Azure",
-					"GCP"
-				],
-				"correctAnswer": "AWS"
-			}
-			
-			""";
+
 	
 	@Test
 	void retrieveSpecificSurveyQuestion_basicScenario() throws JSONException {
@@ -74,4 +63,39 @@ public class SurveyResourceIT {
 		
 		JSONAssert.assertEquals( expectedResponse, responseEntity.getBody(), false );
 	}
+	
+	@Test
+	void addNewSurveyQuestion_basicScenario() {
+		String requestBody = """
+				
+				{
+					"description":"Not so Most Popular DevOps Tool",
+					"options":[
+						"Kubernetes",
+						"Docker",
+						"Terraform"
+					],
+					"correctAnswer":"No one"
+				}
+				
+				""";
+		
+		HttpHeaders headers = new HttpHeaders();
+
+		headers.add( "Content-Type", "application/json" );
+		
+		HttpEntity< String > httpEntity = new HttpEntity< String >( requestBody, headers );
+		
+		ResponseEntity<String> responseEntity = template.exchange( GENERIC_QUESTIONS_URL, HttpMethod.POST, httpEntity, String.class );
+		
+		System.out.println( "Response: " + responseEntity.getStatusCode() + "<<<<<<<<<<<" );
+		
+		assertTrue( responseEntity.getStatusCode().is2xxSuccessful() );
+		String locationHeader = responseEntity.getHeaders().get( "Location" ).get( 0 );
+		System.out.println( locationHeader + "<<<<<<<<<<<<<" );
+		assertTrue( locationHeader.contains( "/surveys/Survey1/questions/" ) );
+		
+		template.delete( locationHeader );
+	}
+	
 }
