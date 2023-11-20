@@ -19,7 +19,7 @@ import org.springframework.http.ResponseEntity;
 public class SurveyResourceIT {
 
 	private static String SPECIFIC_QUESTION_URL = "/surveys/Survey1/questions/Question1";
-	private static String GENERIC_QUESTIONS_URL	= "/surveys/Survey1/questions";
+	private static String GENERIC_QUESTIONS_URL	= "/surveys/Survey1/questions/";
 
 	@Autowired
 	TestRestTemplate template;
